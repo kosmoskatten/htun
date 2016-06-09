@@ -1,23 +1,38 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE QuasiQuotes     #-}
--- | The function @openTun@ open a Linux Tun device and provides
+-- |
+-- Module: System.IO.Tun
+-- Copyright: (c) 2016 Patrik Sandahl
+--
+-- Licence: MIT
+-- Maintainer: patrik.sandahl@gmail.com
+-- Stability: experimental
+-- Portability: non-portable (requires Linux)
+--
+-- Utility function to access Linux Tun devices.
+--
+-- The function 'openTun' open a Linux Tun device and provides
 -- a @Handle@ to it for reading and writing.
 --
--- Before calling @openTun@ it is expected that a Tun device, e.g. tun0,
+-- Before calling 'openTun' it is expected that a Tun device, e.g. tun0,
 -- is created. E.g.:
+--
 -- > sudo ip tuntap add mode tun tun0
 --
 -- Bring the new Tun device up, and then route some traffic to it.
 -- E.g. route all traffic to the 213.0.0.0/24 network to it:
+--
 -- > sudo ip link set tun0 up
 -- > sudo ip route add 213.0.0.0/24 dev tun0
 --
 -- Now the Tun device can be opened. E.g.:
+--
 -- > import System.IO (hGetContents)
 -- > Just h <- openTun "tun0"
 -- > hGetContents h
 --
 -- If some network data is sent to the network it will be printed to stdout.
+--
 -- > ping 213.0.0.13
 module System.IO.Tun
     ( openTun
@@ -37,7 +52,7 @@ C.include "<sys/ioctl.h>"
 C.include "<net/if.h>"
 C.include "<linux/if_tun.h>"
 
--- | Open the named Tun device. If successfull a @Handle@ usable for
+-- | Open the named Tun device. If successfull a 'Handle' usable for
 -- reading and writing is returned.
 openTun :: String -> IO (Maybe Handle)
 openTun device = do
