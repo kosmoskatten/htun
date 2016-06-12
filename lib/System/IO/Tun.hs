@@ -39,9 +39,8 @@ module System.IO.Tun
     ) where
 
 import Foreign.C.String (CString, withCString)
-import GHC.IO.Handle (Handle)
 import Language.C.Inline (CInt)
-import System.Posix (Fd (..), fdToHandle)
+import System.Posix (Fd (..))
 
 import qualified Language.C.Inline as C
 
@@ -52,13 +51,13 @@ C.include "<sys/ioctl.h>"
 C.include "<net/if.h>"
 C.include "<linux/if_tun.h>"
 
--- | Open the named Tun device. If successfull a 'Handle' usable for
--- reading and writing is returned.
-openTun :: String -> IO (Maybe Handle)
+-- | Open the named Tun device. If successfull a 'Fd' is returned to
+-- be used for reading and writing.
+openTun :: String -> IO (Maybe Fd)
 openTun device = do
     fd <- withCString device openTunC
     if fd < 0 then return Nothing
-              else Just <$> fdToHandle (Fd fd)
+              else return $ Just (Fd fd)
 
 -- | "inline-c" function to setup a Tun device.
 openTunC :: CString -> IO CInt
